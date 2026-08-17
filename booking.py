@@ -116,3 +116,23 @@ def format_booking_summary(trip_name: str, destination: str,
         f"  Guests:          {guests}\n"
         f"  Price per person: ${price_per_person:.2f}"
     )
+
+
+def calculate_final_price(base_price: float, nights: int, guests: int,
+                          month: int, country: str) -> float:
+    """Calculate final booking price with seasonal discount and tax.
+
+    Args:
+        base_price: Nightly rate per person in USD.
+        nights: Number of nights to stay.
+        guests: Number of guests.
+        month: Month of travel as an integer (1=January, 12=December).
+        country: Country name in lowercase (e.g. 'france', 'japan').
+
+    Returns:
+        Final total price including seasonal discount and tax as a float.
+    """
+    total_price = calculate_total_price(base_price, nights, guests)
+    discounted_price = apply_seasonal_discount(total_price, month)
+    tax_amount = calculate_tax(discounted_price, country)
+    return round(discounted_price + tax_amount, 2)
