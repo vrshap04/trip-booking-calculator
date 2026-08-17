@@ -6,6 +6,7 @@ from booking import (
     calculate_tax,
     get_price_category,
     format_booking_summary,
+    calculate_final_price,
 )
 
 
@@ -45,3 +46,35 @@ def test_format_booking_summary_returns_correct_string():
         "  Price per person: $300.00"
     )
     assert result == expected
+
+
+def test_calculate_final_price_returns_correct_value():
+    result = calculate_final_price(base_price=100.0, nights=3, guests=2,
+                                    month=1, country="france")
+    # base: 100 * 3 * 2 = 600
+    # discount (15% off in January): 600 * 0.85 = 510
+    # tax (20% for France): 510 * 0.20 = 102
+    # total: 510 + 102 = 612
+    assert result == 612.0
+
+
+def test_calculate_final_price_with_no_discount_month():
+    result = calculate_final_price(base_price=100.0, nights=2, guests=1,
+                                    month=6, country="usa")
+    # base: 100 * 2 * 1 = 200
+    # discount (0% off in June): 200 * 1.0 = 200
+    # tax (8% for USA): 200 * 0.08 = 16
+    # total: 200 + 16 = 216
+    assert result == 216.0
+
+
+def test_calculate_final_price_raises_error_for_invalid_month():
+    with pytest.raises(ValueError):
+        calculate_final_price(base_price=100.0, nights=3, guests=2,
+                              month=13, country="japan")
+
+
+def test_calculate_final_price_raises_error_for_invalid_country():
+    with pytest.raises(ValueError):
+        calculate_final_price(base_price=100.0, nights=3, guests=2,
+                              month=1, country="unknown")
